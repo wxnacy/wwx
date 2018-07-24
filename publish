@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+TAG_NAME=$1
+
+./push_tag $*
+python setup.py sdist
+twine upload dist/wwx-${TAG_NAME}.tar.gz
