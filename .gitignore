@@ -76,6 +76,7 @@ node_modules/
 */node_modules/
 */.cache/
 */local_config.py
+winn*/
 # add by wenxiaoning end
 
 
