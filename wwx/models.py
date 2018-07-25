@@ -35,12 +35,6 @@ class Action(Enum):
     oauth2_access_token = 'oauth2/access_token'
     oauth2_userinfo = 'userinfo'
 
-class Message():
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def test(self):
-        print('Hello World')
 
 
 class PublicPlatform():
@@ -104,7 +98,7 @@ class Message():
         SCAN = 'SCAN'
 
     def __init__(self, xml_input):
-        self.msg = json.loads(json.dumps(xmltodict.parse(xml_input)))
+        self.msg = self.xml2dict(xml_input)
         data = self.msg['xml']
         self.owner_id = data['ToUserName']
         self.sender_id = data['FromUserName']
