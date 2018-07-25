@@ -36,6 +36,11 @@ class Action(Enum):
     oauth2_userinfo = 'userinfo'
 
 
+class OpenPlatform():
+    def __init__(self, app_id, app_secret, **kwargs):
+        self.app_id = app_id
+        self.app_secret = app_secret
+        self.origin_url = 'https://api.weixin.qq.com/cgi-bin/{}'
 
 class PublicPlatform():
     def __init__(self, app_id, app_secret, **kwargs):
@@ -100,9 +105,9 @@ class Message():
     def __init__(self, xml_input):
         self.msg = self.xml2dict(xml_input)
         data = self.msg['xml']
-        self.owner_id = data['ToUserName']
-        self.sender_id = data['FromUserName']
-        self.msg_type = data['MsgType']
+        self.owner_id = data.get('ToUserName')
+        self.sender_id = data.get('FromUserName')
+        self.msg_type = data.get('MsgType')
 
         self.event = data.get('Event')
         self.event_key = data.get('EventKey')
