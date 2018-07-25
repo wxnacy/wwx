@@ -12,6 +12,7 @@ import hashlib
 from Crypto.Cipher import AES
 from urllib import parse
 from datetime import datetime
+from . import security
 
 class Action(Enum):
     token = 'token'
@@ -142,6 +143,7 @@ class Message():
         # 用户发送消息给公众号会产生的字段
         self.msg_id = data.get('MsgId')
         self.content = data.get('Content')
+        self.content = self.content.encode('ISO-8859-1').decode()
         self.pic_url = data.get('PicUrl')
         self.media_id = data.get('MediaId')
         self.thumb_media_id = data.get('ThumbMediaId')
@@ -238,50 +240,34 @@ class Message():
             self.Url = url
             self.Description = digest
 
-def sha1(text):
-    sha1 = hashlib.sha1()
-    sha1.update(text.encode("utf-8"))
-    return sha1.hexdigest()
-
-class AESecurity():
-
-    def __init__(self, key):
-        self.key = key
-        self.iv = key[:16]
-        self.mode = AES.MODE_CBC
-
-    # 解密后，去掉补足的空格用strip() 去掉
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, self.iv)
-        plain_text = cryptor.decrypt(text).decode("utf-8")
-        return plain_text
 
 class WXSecurity():
 
     def __init__(self, token, encoding_aes_key):
-         self.token = token
-         self.encoding_aes_key = encoding_aes_key
+        self.token = token
+        self.encoding_aes_key = encoding_aes_key
+        aes_key = base64.b64decode('{}='.format(self.encoding_aes_key))
+        self.aes = security.AESecurity(aes_key)
 
     def check_request(self, signature, timestamp, nonce):
         '''检查请求是否复核加密'''
         data = [self.token, str(timestamp), str(nonce)]
         data.sort()
-        sign = sha1(''.join(data))
+        sign = security.sha1(''.join(data))
         return sign == signature
 
-    def decrypt_security_body(self, msg_encrypt, msg_signature, timestamp, nonce):
+    def decrypt_security_body(self, msg_encrypt, msg_signature, timestamp,
+            nonce):
         '''获取加密消息体'''
         check_data = [self.token, msg_encrypt, timestamp, nonce]
         check_data.sort()
-        sign = sha1(''.join(check_data))
+        sign = security.sha1(''.join(check_data))
         if sign != msg_signature:
             raise Exception('消息验证失败')
 
         try:
-            aes_key = base64.b64decode('{}='.format(self.encoding_aes_key))
-            aes = AESecurity(aes_key)
             aes_msg = base64.b64decode(msg_encrypt)
-            body = aes.decrypt(aes_msg)
+            body = self.aes.decrypt(aes_msg)
 
             res = body[20:body.rfind('>') + 1]
             return res
