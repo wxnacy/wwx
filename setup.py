@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'wwx',
-    version = '0.1.1',
+    version = '0.2.0',
     keywords='wx',
     description = 'a library for wx Developer',
     license = 'MIT License',

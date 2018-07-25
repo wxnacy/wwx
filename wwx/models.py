@@ -35,12 +35,40 @@ class Action(Enum):
     oauth2_access_token = 'oauth2/access_token'
     oauth2_userinfo = 'userinfo'
 
+    # 开放平台动作
+    component_api_component_token = 'component/api_component_token'
+    component_api_create_preauthcode = 'component/api_create_preauthcode'
+
 
 class OpenPlatform():
+    '''
+    第三方平台
+    doc: https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1453779503&token=&lang=zh_CN
+    '''
     def __init__(self, app_id, app_secret, **kwargs):
         self.app_id = app_id
         self.app_secret = app_secret
         self.origin_url = 'https://api.weixin.qq.com/cgi-bin/{}'
+
+    def get_access_token(self, verify_ticket):
+        '''获取 component_access_token'''
+        url = self.origin_url.format(Action.component_api_component_token.value)
+        res = requests.post(url, json={
+            "component_appid": self.app_id,
+            "component_appsecret": self.app_secret,
+            "component_verify_ticket": verify_ticket
+        })
+        return res.json()
+
+    def get_pre_auth_code(self, access_token):
+        '''获取预授权码 pre_auth_code'''
+        suffix = '{}?component_access_token={}'.format(
+            Action.component_api_create_preauthcode.value, access_token)
+        url = self.origin_url.format(suffix)
+        res = requests.post(url, json={
+            "component_appid": self.app_id
+        })
+        return res.json()
 
 class PublicPlatform():
     def __init__(self, app_id, app_secret, **kwargs):
