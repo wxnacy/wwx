@@ -9,6 +9,7 @@ import xmltodict
 import json
 import base64
 import hashlib
+import chardet
 from Crypto.Cipher import AES
 from urllib import parse
 from datetime import datetime
@@ -143,7 +144,10 @@ class Message():
         # 用户发送消息给公众号会产生的字段
         self.msg_id = data.get('MsgId')
         self.content = data.get('Content')
-        self.content = self.content.encode('ISO-8859-1').decode()
+        print(self.content)
+        #  if self.content:
+            #  #  #  print(chardet.detect(self.content))
+            #  self.content = self.content.encode('ISO-8859-1').decode()
         self.pic_url = data.get('PicUrl')
         self.media_id = data.get('MediaId')
         self.thumb_media_id = data.get('ThumbMediaId')

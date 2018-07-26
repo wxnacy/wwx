@@ -5,6 +5,7 @@
 
 from Crypto.Cipher import AES
 import hashlib
+import chardet
 
 def sha1(text):
     sha1 = hashlib.sha1()
@@ -21,5 +22,9 @@ class AESecurity():
     # 解密后，去掉补足的空格用strip() 去掉
     def decrypt(self, text):
         cryptor = AES.new(self.key, self.mode, self.iv)
-        plain_text = cryptor.decrypt(text).decode('ISO-8859-1')
+        print(chardet.detect(cryptor.decrypt(text)))
+        plain_bytes = cryptor.decrypt(text)
+        plain_type = chardet.detect(plain_bytes)
+        plain_text = plain_bytes.decode(plain_type.get('encoding'))
+        print(plain_text)
         return plain_text
