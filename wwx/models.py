@@ -190,10 +190,10 @@ class Message():
         return self._generator_reply(msg_type=self.MsgType.image.value,
                                      media_id=media_id)
 
-    def reply_video(self, media_id):
+    def reply_video(self, media_id, title=None, description=None):
         """回复视频"""
         return self._generator_reply(msg_type=self.MsgType.video.value,
-                                     media_id=media_id)
+            media_id=media_id, title=title, description=description)
 
     def make_news(self, data):
         return [self.News(**o).to_dict() for o in data]
@@ -224,6 +224,11 @@ class Message():
             xml['Image'] = dict(MediaId=kwargs.get('media_id'))
         elif msg_type == self.MsgType.video.value:
             xml['Video'] = dict(MediaId=kwargs.get('media_id'))
+            if kwargs.get('title'):
+                xml['Video']['Title'] = kwargs['title']
+            if kwargs.get('description'):
+                xml['Video']['Description'] = kwargs['description']
+
 
         return xmltodict.unparse({"xml": xml})
 
