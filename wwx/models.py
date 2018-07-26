@@ -92,6 +92,14 @@ class PublicPlatform():
         return self._get(Action.ticket_getticket.value,
                 type='jsapi',access_token=access_token)
 
+    def get_user_info(self, access_token, openid, lang=None):
+        '''
+        获取用户信息
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839
+        '''
+        return self._get(Action.user_info.value, access_token=access_token,
+                         openid=openid, lang=lang)
+
     def _auth_args(self):
         return {'appid': self.app_id, 'secret': self.app_secret}
 
