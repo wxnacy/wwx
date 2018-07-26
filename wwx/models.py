@@ -100,6 +100,135 @@ class PublicPlatform():
         return self._get(Action.user_info.value, access_token=access_token,
                          openid=openid, lang=lang)
 
+    def generator_short_url(self, access_token, long_url):
+        """
+        将一条长链接转成短链接。
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433600
+        :param access_token:
+        :param long_url:
+        :return:
+        """
+        return self._post(Action.shorturl.value, action='long2short',
+                          access_token=access_token, long_url=long_url)
+
+    def send_template(self, access_token, openid, template_id, data, url="",
+            topcolor=""):
+        """
+        发送模板消息
+        https://mp.weixin.qq.com/advanced/tmplmsg?action=faq&token=813469155&lang=zh_CN
+        :return:
+        """
+        return self._post(Action.send_template.value, access_token=access_token,
+            touser=openid, template_id=template_id, url=url, topcolor=topcolor,
+            data=data)
+
+    def send_miniprogram_template(self,access_token, openid, template_id, data, miniprogram, url=""):
+        """
+        发送微信小程序模板消息
+        https://mp.weixin.qq.com/advanced/tmplmsg?action=faq&token=813469155&lang=zh_CN
+        :return:
+        """
+        return self._post(Action.send_template.value, access_token=access_token,
+                          touser=openid, template_id=template_id, url=url, miniprogram=miniprogram,
+                          data=data)
+
+
+    def get_material_list(self, access_token, type, offset=0, count=20):
+        """
+        获取素材列表
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738734
+        :param access_token:
+        :return:
+        """
+        return self._post(Action.material.value, access_token=access_token,
+                          type=type, offset=offset, count=count)
+
+    def get_material(self, access_token, media_id):
+        """
+        获取永久素材
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738730
+        :param access_token:
+        :return:
+        """
+        return self._post(Action.material_one.value, access_token=access_token,
+                          media_id=media_id)
+
+    def get_material_count(self, access_token):
+        """
+        获取素材列表
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738734
+        :param access_token:
+        :return:
+        """
+        return self._get(Action.material_count.value, access_token=access_token)
+
+    def get_media_url(self, access_token, media_id):
+        """
+        获取素材列表
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738734
+        :param access_token:
+        :return:
+        """
+        return 'https://api.weixin.qq.com/cgi-bin/media/get?access_token={}&media_id={}'.format(
+            access_token, media_id)
+
+    def create_menu(self, access_token, button):
+        """
+        创建菜单
+        """
+        # json.dumps(kwargs, ensure_ascii=False)
+        return self._post(Action.create_menu.value, access_token=access_token,
+                          button=button)
+
+    def get_menu(self, access_token):
+        """
+        获取菜单
+        """
+        return self._get(Action.get_menu.value, access_token=access_token)
+
+    def menu_addconditional(self,access_token, button, matchrule):
+        """
+        创建个性化菜单
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1455782296
+        """
+        return self._post(Action.menu_addconditional.value,
+                access_token=access_token, button=button, matchrule=matchrule)
+
+
+    def qrcode_create(self, access_token, scene,
+                      action_name='QR_LIMIT_STR_SCENE',expire_seconds=2592000):
+        """
+        创建二维码ticket
+        https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433542
+        :param access_token:
+        :param scene:
+        :param action_name: 二维码类型，QR_SCENE为临时的整型参数值，
+                                        QR_STR_SCENE为临时的字符串参数值，
+                                        QR_LIMIT_SCENE为永久的整型参数值，
+                                        QR_LIMIT_STR_SCENE 为永久的字符串参数值
+        :return:
+        """
+        kwargs = dict(
+            action_name=action_name
+        )
+        if not action_name.startswith('QR_LIMIT'):
+            kwargs['expire_seconds'] = expire_seconds
+
+        if 'STR' not in action_name:
+            kwargs['action_info'] = {"scene": {"scene_id": int(scene)}}
+        else:
+            kwargs['action_info'] = {"scene": {"scene_str": scene}}
+
+        res = self._post(Action.qrcode_create.value, access_token=access_token,
+                         **kwargs)
+
+        if 'ticket' in res:
+            query = parse.urlencode(dict(ticket=res['ticket']))
+            res['qrcode_url'] = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?{}'.format(
+                query)
+        print(res)
+        return res
+
     def _auth_args(self):
         return {'appid': self.app_id, 'secret': self.app_secret}
 
