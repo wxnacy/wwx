@@ -41,6 +41,8 @@ class Action(Enum):
     component_api_component_token = 'component/api_component_token'
     component_api_create_preauthcode = 'component/api_create_preauthcode'
     component_api_query_auth = 'component/api_query_auth'
+    component_api_authorizer_token = 'component/api_authorizer_token'
+    component_api_get_authorizer_info = 'component/api_get_authorizer_info'
 
 
 class OpenPlatform():
@@ -74,6 +76,23 @@ class OpenPlatform():
         res = self._post(Action.component_api_query_auth.value,
                 component_access_token = component_access_token,
                 authorization_code = authorization_code)
+        return res
+
+    def api_authorizer_token(self, component_access_token,
+            authorizer_appid, authorizer_refresh_token):
+        '''获取授权方 token '''
+        res = self._post(Action.component_api_authorizer_token.value,
+                component_access_token = component_access_token,
+                authorizer_appid = authorizer_appid,
+                authorizer_refresh_token = authorizer_refresh_token)
+        return res
+
+    def api_get_authorizer_info(self, component_access_token,
+            authorizer_appid)
+        '''获取授权方信息'''
+        res = self._post(Action.component_api_get_authorizer_info.value,
+                component_access_token = component_access_token,
+                authorizer_appid = authorizer_appid)
         return res
 
     def _post(self, _action, **kwargs):
