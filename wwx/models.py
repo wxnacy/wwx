@@ -261,7 +261,6 @@ class PublicPlatform():
             query = parse.urlencode(dict(ticket=res['ticket']))
             res['qrcode_url'] = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?{}'.format(
                 query)
-        print(res)
         return res
 
     def _auth_args(self):
@@ -444,7 +443,6 @@ class WXSecurity():
 
         try:
             aes_msg = base64.b64decode(msg_encrypt)
-            print(aes_msg)
             body = self.aes.decrypt(aes_msg)
 
             res = body[20:body.rfind('>') + 1]
