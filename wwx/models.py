@@ -40,6 +40,7 @@ class Action(Enum):
     # 开放平台动作
     component_api_component_token = 'component/api_component_token'
     component_api_create_preauthcode = 'component/api_create_preauthcode'
+    component_api_query_auth = 'component/api_query_auth'
 
 
 class OpenPlatform():
@@ -62,15 +63,30 @@ class OpenPlatform():
         })
         return res.json()
 
-    def get_pre_auth_code(self, access_token):
+    def get_pre_auth_code(self, component_access_token):
         '''获取预授权码 pre_auth_code'''
-        suffix = '{}?component_access_token={}'.format(
-            Action.component_api_create_preauthcode.value, access_token)
-        url = self.origin_url.format(suffix)
-        res = requests.post(url, json={
-            "component_appid": self.app_id
-        })
-        return res.json()
+        res = self._post(Action.component_api_create_preauthcode.value,
+            component_access_token=component_access_token)
+        return res
+
+    def api_query_auth(self, component_access_token, authorization_code):
+        '''获取身份'''
+        res = self._post(Action.component_api_query_auth.value,
+                component_access_token = component_access_token,
+                authorization_code = authorization_code)
+        return res
+
+    def _post(self, _action, **kwargs):
+        '''post 请求'''
+        url = self.origin_url.format(_action)
+        params = {"component_access_token": kwargs.get('component_access_token')}
+        kwargs.pop('component_access_token')
+        kwargs['component_appid'] = self.app_id
+        kwargs = json.dumps(kwargs,ensure_ascii=False).encode('utf-8')
+        res = requests.post(url, params=params, data=kwargs,
+            headers={"Content-Type":"application/json;charset=UTF-8"})
+        res = json.loads(str(res.content, 'utf8'))
+        return res
 
 class PublicPlatform():
     def __init__(self, app_id, app_secret, **kwargs):
@@ -409,6 +425,7 @@ class WXSecurity():
 
         try:
             aes_msg = base64.b64decode(msg_encrypt)
+            print(aes_msg)
             body = self.aes.decrypt(aes_msg)
 
             res = body[20:body.rfind('>') + 1]
