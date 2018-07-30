@@ -88,7 +88,7 @@ class OpenPlatform():
         return res
 
     def api_get_authorizer_info(self, component_access_token,
-            authorizer_appid)
+            authorizer_appid):
         '''获取授权方信息'''
         res = self._post(Action.component_api_get_authorizer_info.value,
                 component_access_token = component_access_token,
