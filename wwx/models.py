@@ -43,6 +43,7 @@ class Action(Enum):
     component_api_query_auth = 'component/api_query_auth'
     component_api_authorizer_token = 'component/api_authorizer_token'
     component_api_get_authorizer_info = 'component/api_get_authorizer_info'
+    component_clear_quota = 'component/clear_quota'
 
 
 class OpenPlatform():
@@ -93,6 +94,16 @@ class OpenPlatform():
         res = self._post(Action.component_api_get_authorizer_info.value,
                 component_access_token = component_access_token,
                 authorizer_appid = authorizer_appid)
+        return res
+
+    def clear_quota(self, component_access_token):
+        '''
+        第三方平台对其所有API调用次数清零（只与第三方平台相关，与公众号无关
+        ，接口如api_component_token）
+        https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318587&token=&lang=zh_CN
+        '''
+        res = self._post(Action.component_clear_quota.value,
+                component_access_token = component_access_token)
         return res
 
     def _post(self, _action, **kwargs):
