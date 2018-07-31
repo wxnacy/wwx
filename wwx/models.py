@@ -31,6 +31,7 @@ class Action(Enum):
     menu_addconditional = 'menu/addconditional'
     ticket_getticket = 'ticket/getticket'
     send_template = 'message/template/send'
+    clear_quota = 'clear_quota'
 
     gettoken = 'gettoken'
 
@@ -145,6 +146,16 @@ class PublicPlatform():
         '''
         return self._get(Action.user_info.value, access_token=access_token,
                          openid=openid, lang=lang)
+
+    def clear_quota(self, access_token):
+        '''
+        公众号调用或第三方代公众号调用对公众号的所有API调用（包括第三方代公众号
+        调用）次数进行清零
+        https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318587&token=&lang=zh_CN
+        '''
+        return self._post(Action.clear_quota.value, access_token = access_token,
+                appid = self.app_id)
+
 
     def generator_short_url(self, access_token, long_url):
         """
