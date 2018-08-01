@@ -127,9 +127,9 @@ class OpenPlatform():
         刷新access_token（如果需要）
         https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318590&token=&lang=zh_CN
         '''
-        return self._get(Action.sns_oauth2_component_access_token.value,
+        return self._get(Action.sns_oauth2_component_refresh_token.value,
             appid = appid, refresh_token = refresh_token,
-            grant_type = 'authorization_code',
+            grant_type = 'refresh_token',
             component_access_token = component_access_token)
 
     def sns_userinfo(self, access_token, openid, lang = 'zh_CN'):
@@ -138,8 +138,7 @@ class OpenPlatform():
         https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318590&token=&lang=zh_CN
         '''
         return self._get(Action.sns_userinfo.value,
-            appid = appid, code = code, grant_type = 'authorization_code',
-            component_access_token = component_access_token)
+            access_token = access_token, openid = openid, lang = lang)
 
     def _post(self, _action, **kwargs):
         '''post 请求'''
