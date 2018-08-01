@@ -45,6 +45,10 @@ class Action(Enum):
     component_api_authorizer_token = 'component/api_authorizer_token'
     component_api_get_authorizer_info = 'component/api_get_authorizer_info'
     component_clear_quota = 'component/clear_quota'
+    # 开发平台代替公众号发起授权
+    sns_oauth2_component_access_token = 'sns/oauth2/component/access_token'
+    sns_oauth2_component_refresh_token = 'sns/oauth2/component/refresh_token'
+    sns_userinfo = 'sns/userinfo'
 
 
 class OpenPlatform():
@@ -107,6 +111,36 @@ class OpenPlatform():
                 component_access_token = component_access_token)
         return res
 
+    def sns_oauth2_component_access_token(self, appid, code,
+            component_access_token):
+        '''
+        通过code换取access_token
+        https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318590&token=&lang=zh_CN
+        '''
+        return self._get(Action.sns_oauth2_component_access_token.value,
+            appid = appid, code = code, grant_type = 'authorization_code',
+            component_access_token = component_access_token)
+
+    def sns_oauth2_component_refresh_token(self, appid, refresh_token,
+            component_access_token):
+        '''
+        刷新access_token（如果需要）
+        https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318590&token=&lang=zh_CN
+        '''
+        return self._get(Action.sns_oauth2_component_access_token.value,
+            appid = appid, refresh_token = refresh_token,
+            grant_type = 'authorization_code',
+            component_access_token = component_access_token)
+
+    def sns_userinfo(self, access_token, openid, lang = 'zh_CN'):
+        '''
+        通过网页授权access_token获取用户基本信息（需授权作用域为snsapi_userinfo ）
+        https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318590&token=&lang=zh_CN
+        '''
+        return self._get(Action.sns_userinfo.value,
+            appid = appid, code = code, grant_type = 'authorization_code',
+            component_access_token = component_access_token)
+
     def _post(self, _action, **kwargs):
         '''post 请求'''
         url = self.origin_url.format(_action)
@@ -118,6 +152,16 @@ class OpenPlatform():
             headers={"Content-Type":"application/json;charset=UTF-8"})
         res = json.loads(str(res.content, 'utf8'))
         return res
+
+    def _get(self, _action, **kwargs):
+        '''get 请求'''
+        #  url = self.origin_url.format(_action)
+        if _action.startswith('sns'):
+            url = 'https://api.weixin.qq.com/{}'.format(_action)
+        kwargs.update(dict(component_appid = self.app_id,
+            ))
+        res = requests.get(url, params=kwargs)
+        return res.json()
 
 class PublicPlatform():
     def __init__(self, app_id, app_secret, **kwargs):
