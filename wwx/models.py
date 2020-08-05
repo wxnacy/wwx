@@ -491,7 +491,7 @@ class WXSecurity():
         self.aes = security.AESecurity(aes_key)
 
     def check_request(self, signature, timestamp, nonce):
-        '''检查请求是否复核加密'''
+        '''检查请求是否符合加密'''
         data = [self.token, str(timestamp), str(nonce)]
         data.sort()
         sign = security.sha1(''.join(data))

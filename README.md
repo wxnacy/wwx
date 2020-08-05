@@ -41,3 +41,13 @@ print(res)
 # component_access_token	第三方平台access_token
 # expires_in	            有效期
 ```
+
+- **获取预授权码 pre_auth_code**
+
+```python
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author: wxnacy(wxnacy@gmail.com)
+
+
+```
